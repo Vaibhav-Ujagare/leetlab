@@ -10,5 +10,3 @@ const app = express();
 app.listen(port, () => {
   console.log(`Server is running ${port}`);
 });
-
-
