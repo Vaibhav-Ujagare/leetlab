@@ -26,11 +26,11 @@ model User {
   image                     String?
   role                      UserRole
   password                  String
-  isEmailVerified           Boolean
-  forgotPasswordToken       String
-  forgotPasswordTokenExpiry DateTime
-  refreshToken              String
-  emailVerificationToken    String
+  isEmailVerified           Boolean @default(false)
+  forgotPasswordToken       String?
+  forgotPasswordTokenExpiry DateTime?
+  refreshToken              String?
+  emailVerificationToken    String?
   emailVerificationExpiry   DateTime
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
