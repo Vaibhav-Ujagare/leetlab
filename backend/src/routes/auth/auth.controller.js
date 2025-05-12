@@ -147,6 +147,10 @@ export const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid Username of Password");
   }
 
+  if (!user.isEmailVerified) {
+    throw new ApiError(401, "User Not Verified");
+  }
+
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
     user.id
   );
@@ -406,12 +410,14 @@ export const resetPasswordController = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Password mismatch");
   }
 
+  const hashedPassword = await bcrypt.hash(confPassword, 10);
+
   await db.user.update({
     where: {
       id: user.id,
     },
     data: {
-      password: confPassword,
+      password: hashedPassword,
       forgotPasswordToken: null,
       forgotPasswordTokenExpiry: null,
     },
@@ -420,4 +426,13 @@ export const resetPasswordController = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, { user }, "Password reset Successfully"));
+});
+
+export const getCurrentUser = asyncHandler(async (req, res) => {
+  console.log("USER: ", req.user);
+
+  return res
+    .status(200)
+    .setHeader("Authorization", `Bearer ${req.cookies.accessToken}`)
+    .json(new ApiResponse(200, req.user, "Current User Fetched Successfully"));
 });
