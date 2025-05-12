@@ -19,19 +19,48 @@ enum UserRole {
   USER
 }
 
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
 model User {
-  id                        String   @id @default(uuid())
+  id                        String    @id @default(uuid())
   username                  String?
-  email                     String   @unique
+  email                     String    @unique
   image                     String?
   role                      UserRole
   password                  String
-  isEmailVerified           Boolean @default(false)
+  isEmailVerified           Boolean   @default(false)
   forgotPasswordToken       String?
   forgotPasswordTokenExpiry DateTime?
   refreshToken              String?
   emailVerificationToken    String?
   emailVerificationExpiry   DateTime
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  problems Problem[]
+}
+
+model Problem {
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  difficulty  Difficulty
+  tags        String[]
+  userId      String
+  examples    Json
+  constraints String
+  hints       String?
+  editorial   String?
+  testCases Json
+  codeSnippets Json
+  referenceSolutions Json
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relationships
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
 }

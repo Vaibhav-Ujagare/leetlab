@@ -429,7 +429,6 @@ export const resetPasswordController = asyncHandler(async (req, res) => {
 });
 
 export const getCurrentUser = asyncHandler(async (req, res) => {
-  console.log("USER: ", req.user);
 
   return res
     .status(200)
