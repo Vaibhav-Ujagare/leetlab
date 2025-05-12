@@ -35,3 +35,26 @@ export const isLoggedIn = asyncHandler(async (req, res, next) => {
     throw new ApiError(401, error?.message || "Invalid Access Token");
   }
 });
+
+export const isAdmin = asyncHandler(async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        role: true,
+      },
+    });
+
+    if (user.role !== "ADMIN" || !user) {
+      throw new ApiError(401, "Access Deined - Admin Only");
+    }
+
+    next();
+  } catch (error) {
+    throw new ApiError(401, error?.message || "Error Checking Admin Role");
+  }
+});
