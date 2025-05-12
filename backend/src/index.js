@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth/auth.route.js";
+import problemRoutes from "./routes/problems/problem.route.js";
 
 dotenv.config();
 
@@ -15,6 +16,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/api/v1/auth", authRoutes);
+
+app.use("/api/v1/problems", problemRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running ${port}`);
