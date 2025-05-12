@@ -93,12 +93,21 @@ export const registerUser = asyncHandler(async (req, res) => {
   const emailVerificationToken = crypto.randomBytes(32).toString("hex");
   newUser.emailVerificationToken = emailVerificationToken;
 
+  await db.user.update({
+    where: {
+      id: newUser.id,
+    },
+    data: {
+      emailVerificationToken: emailVerificationToken,
+    },
+  });
+
   sendMail({
     email: email,
     subject: "Verify your email",
     mailGenContent: emailVerificationMailGenContent(
       username,
-      `${process.env.BASE_URL}/api/v1/users/verify/${emailVerificationToken}`
+      `${process.env.BASE_URL}/api/v1/auth/verify/${emailVerificationToken}`
     ),
   });
 
@@ -190,4 +199,93 @@ export const logoutUser = asyncHandler(async (req, res) => {
     .clearCookie("accessToken", cookieOptions)
     .clearCookie("refreshToken", cookieOptions)
     .json(new ApiResponse(200, {}, "User Logged Out!"));
+});
+
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+  const incomingRefreshToken =
+    req.cookies.refreshToken || req.body.refreshAccessToken;
+
+  if (!incomingRefreshToken) {
+    throw new ApiError(401, "unauthorized request");
+  }
+  try {
+    const decodedRefreshToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+    const user = await db.user.findUnique({
+      where: {
+        id: decodedRefreshToken.id,
+      },
+    });
+
+    if (!user) {
+      throw new ApiError(401, "Invalid Refresh Token");
+    }
+
+    if (incomingRefreshToken !== user?.refreshToken) {
+      throw new ApiError(401, "Refresh Token Is Expired Or Used");
+    }
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      path: "/", // ensure it applies site-wide
+    };
+
+    const { accessToken, newRefreshToken } =
+      await generateAccessAndRefreshTokens(user.id);
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", newRefreshToken, cookieOptions)
+      .json(
+        new ApiResponse(
+          200,
+          { accessToken, refreshToken: newRefreshToken },
+          "Access Token Refreshed Successfully"
+        )
+      );
+  } catch (error) {
+    throw new ApiError(401, error?.message || "Invalid Refresh Token");
+  }
+});
+
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+
+  if (!token) {
+    throw new ApiError(401, "Invalid Token");
+  }
+
+  const user = await db.user.findFirst({
+    where: {
+      emailVerificationToken: token,
+      // emailVerificationExpiry: {
+      //   gt: new Date(), // token not expired
+      // },
+    },
+  });
+
+  console.log(user);
+
+  if (!user) {
+    throw new ApiError(401, "Verification Token Expired");
+  }
+
+  await db.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      isEmailVerified: true,
+      emailVerificationToken: null,
+    },
+  });
+
+  return res
+    .status(201)
+    .json(new ApiResponse(200, user, "User Verified Successfully"));
 });
