@@ -14,6 +14,18 @@ import crypto from "crypto";
 import { UserRole } from "../../generated/prisma/index.js";
 import jwt from "jsonwebtoken";
 
+const generateTemporaryToken = async function () {
+  const unHashedToken = crypto.randomBytes(20).toString("hex");
+
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(unHashedToken)
+    .digest("hex");
+
+  const tokenExpiry = new Date(Date.now() + 20 * 60 * 1000);
+  return { hashedToken, tokenExpiry };
+};
+
 export const generateAccessAndRefreshTokens = async (userId) => {
   try {
     const user = await db.user.findUnique({
@@ -263,13 +275,11 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   const user = await db.user.findFirst({
     where: {
       emailVerificationToken: token,
-      // emailVerificationExpiry: {
-      //   gt: new Date(), // token not expired
-      // },
+      emailVerificationExpiry: {
+        gt: new Date(), // token not expired
+      },
     },
   });
-
-  console.log(user);
 
   if (!user) {
     throw new ApiError(401, "Verification Token Expired");
@@ -288,4 +298,126 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(new ApiResponse(200, user, "User Verified Successfully"));
+});
+
+export const resendVerificationEmail = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  // const user = await User.findOne({ email });
+
+  const emailVerificationToken = crypto.randomBytes(32).toString("hex");
+
+  const user = await db.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new ApiError(401, "User not registered");
+  }
+
+  await db.user.update({
+    where: {
+      email,
+    },
+    data: {
+      emailVerificationToken: emailVerificationToken,
+      emailVerificationExpiry: new Date(Date.now() + 20 * 60 * 1000),
+    },
+  });
+
+  sendMail({
+    email: email,
+    subject: "Verify your email",
+    mailGenContent: resendEmailVerificationMailGenContent(
+      user.username,
+      `${process.env.BASE_URL}/api/v1/auth/verify/${emailVerificationToken}`
+    ),
+  });
+
+  return res
+    .status(201)
+    .json(new ApiResponse(200, user, "Resend Email Successfully"));
+});
+
+export const forgotPasswordRequest = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await db.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new ApiError(401, "User not found");
+  }
+
+  const { hashedToken, tokenExpiry } = await generateTemporaryToken();
+
+  // user.forgotPasswordToken = hashedToken;
+  // user.forgotPasswordTokenExpiry = tokenExpiry;
+
+  await db.user.update({
+    where: {
+      email,
+    },
+    data: {
+      forgotPasswordToken: hashedToken,
+      forgotPasswordTokenExpiry: tokenExpiry,
+    },
+  });
+
+  sendMail({
+    email: email,
+    subject: "Reset Password",
+    mailGenContent: resetPasswordVerificationMailGenContent(
+      user.username,
+      `${process.env.BASE_URL}/api/v1/auth/reset-password/${hashedToken}`
+    ),
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { user }, "Reset Password link send on given email ")
+    );
+});
+
+export const resetPasswordController = asyncHandler(async (req, res) => {
+  const { hashedToken } = req.params;
+  const { password, confPassword } = req.body;
+
+  console.log(password, confPassword);
+  const user = await db.user.findFirst({
+    where: {
+      forgotPasswordToken: hashedToken,
+      forgotPasswordTokenExpiry: {
+        gt: new Date(), // token not expired
+      },
+    },
+  });
+
+  if (!user) {
+    throw new ApiError(400, "Token is invalid or has expired");
+  }
+
+  if (password !== confPassword) {
+    throw new ApiError(400, "Password mismatch");
+  }
+
+  await db.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      password: confPassword,
+      forgotPasswordToken: null,
+      forgotPasswordTokenExpiry: null,
+    },
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { user }, "Password reset Successfully"));
 });
