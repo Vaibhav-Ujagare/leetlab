@@ -22,6 +22,7 @@ export const isLoggedIn = asyncHandler(async (req, res, next) => {
         id: true,
         email: true,
         username: true,
+        role: true,
       },
     });
 

@@ -45,22 +45,22 @@ model User {
 }
 
 model Problem {
-  id          String     @id @default(uuid())
-  title       String
-  description String
-  difficulty  Difficulty
-  tags        String[]
-  userId      String
-  examples    Json
-  constraints String
-  hints       String?
-  editorial   String?
-  testCases Json
-  codeSnippets Json
+  id                 String     @id @default(uuid())
+  title              String     @unique
+  description        String
+  difficulty         Difficulty
+  tags               String[]
+  userId             String
+  examples           Json
+  constraints        String
+  hints              String?
+  editorial          String?
+  testCases          Json
+  codeSnippets       Json
   referenceSolutions Json
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
 
   // Relationships
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

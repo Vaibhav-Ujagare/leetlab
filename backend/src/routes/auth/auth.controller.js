@@ -93,7 +93,7 @@ export const registerUser = asyncHandler(async (req, res) => {
       email,
       password: hashedPassword,
       username,
-      role: UserRole.USER,
+      role: UserRole.ADMIN,
       emailVerificationExpiry: new Date(Date.now() + 20 * 60 * 1000),
     },
   });
@@ -159,8 +159,6 @@ export const loginUser = asyncHandler(async (req, res) => {
     where: { id: user.id },
     data: { refreshToken },
   });
-
-  console.log(accessToken, refreshToken);
 
   const loggedInUser = await db.user.findUnique({
     where: {
@@ -392,7 +390,6 @@ export const resetPasswordController = asyncHandler(async (req, res) => {
   const { hashedToken } = req.params;
   const { password, confPassword } = req.body;
 
-  console.log(password, confPassword);
   const user = await db.user.findFirst({
     where: {
       forgotPasswordToken: hashedToken,
@@ -429,7 +426,6 @@ export const resetPasswordController = asyncHandler(async (req, res) => {
 });
 
 export const getCurrentUser = asyncHandler(async (req, res) => {
-
   return res
     .status(200)
     .setHeader("Authorization", `Bearer ${req.cookies.accessToken}`)
