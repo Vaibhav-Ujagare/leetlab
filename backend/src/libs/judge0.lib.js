@@ -14,8 +14,9 @@ export const submitBatch = async (submissions) => {
   try {
     const { data } = await axios.post(
       `${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`,
-      { submissions } // key must be `submissions`, not `submission`
+      { submissions }
     );
+    console.log(data);
     return data;
   } catch (error) {
     throw new ApiError(401, error?.message || "Error in submitBatch Function");
@@ -40,6 +41,7 @@ export const pollBatchResults = async (tokens) => {
     const results = data.submissions;
     const isAllDone = results.every((result) => result.status.id >= 3);
 
+    console.log(isAllDone);
 
     if (isAllDone) return results;
 

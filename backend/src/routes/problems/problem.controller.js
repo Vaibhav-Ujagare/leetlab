@@ -42,10 +42,12 @@ export const createProblem = asyncHandler(async (req, res) => {
         stdin: input,
         expected_out: output,
       }));
+      console.log(submissions);
 
-      const sumbissionResults = await submitBatch(submissions);
-
-      const tokens = sumbissionResults.map((res) => res.token);
+      const submissionResults = await submitBatch(submissions);
+      console.log("----------------------", submissionResults);
+      
+      const tokens = submissionResults.map((res) => res.token);
 
       const results = await pollBatchResults(tokens);
 
