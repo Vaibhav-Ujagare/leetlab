@@ -26,7 +26,6 @@ export const submitBatch = async (submissions) => {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const pollBatchResults = async (tokens) => {
-  console.log("reached in pollBatchResults");
   while (true) {
     const { data } = await axios.get(
       `${process.env.JUDGE0_API_URL}/submissions/batch`,
@@ -40,8 +39,6 @@ export const pollBatchResults = async (tokens) => {
 
     const results = data.submissions;
     const isAllDone = results.every((result) => result.status.id >= 3);
-
-    console.log(isAllDone);
 
     if (isAllDone) return results;
 
