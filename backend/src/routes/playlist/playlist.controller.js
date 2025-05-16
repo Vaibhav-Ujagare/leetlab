@@ -83,8 +83,86 @@ export const getPlaylistDetails = asyncHandler(async (req, res) => {
   }
 });
 
-export const addProblemToPlaylist = asyncHandler(async (req, res) => {});
+export const addProblemToPlaylist = asyncHandler(async (req, res) => {
+  const { playlistId } = req.params;
+  const { problemIds } = req.body;
 
-export const deletePlaylist = asyncHandler(async (req, res) => {});
+  try {
+    if (!Array.isArray(problemIds) || problemIds.length === 0) {
+      throw new ApiError(401, "Invalid Problem id");
+    }
 
-export const deleteProblemFromPlaylist = asyncHandler(async (req, res) => {});
+    const problemsInPlaylist = await db.problemsInPlaylist.createMany({
+      data: problemIds.map((probId) => {
+        playlistId, probId;
+      }),
+    });
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { problemsInPlaylist },
+          "Problem Added Successfully"
+        )
+      );
+  } catch (error) {
+    throw new ApiError(
+      401,
+      error?.message || "Error while adding a problem into playlist"
+    );
+  }
+});
+
+export const deletePlaylist = asyncHandler(async (req, res) => {
+  const { playlistId } = req.params;
+
+  try {
+    const problem = await db.playlist.delete({
+      where: {
+        id: playlistId,
+      },
+    });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Playlist Deleted Successfully"));
+  } catch (error) {
+    throw new ApiError(
+      401,
+      error?.message || "Error while deleting the playlist"
+    );
+  }
+});
+
+export const deleteProblemFromPlaylist = asyncHandler(async (req, res) => {
+  const { playlistId } = req.params;
+  const { problemIds } = req.body;
+
+  try {
+    if (!Array.isArray(problemIds) || problemIds.length === 0) {
+      throw new ApiError(401, "Invalid Problem id");
+    }
+
+    const deletedProblem = await db.problemsInPlaylist({
+      where: {
+        playlistId,
+        problemId: {
+          in: problemIds,
+        },
+      },
+    });
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, {}, "Problem removed from Playlist Successfully")
+      );
+  } catch (error) {
+    throw new ApiError(
+      401,
+      error?.message || "Error while deleting the playlist"
+    );
+  }
+});
