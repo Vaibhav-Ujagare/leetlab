@@ -16,7 +16,6 @@ export const submitBatch = async (submissions) => {
       `${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`,
       { submissions }
     );
-    console.log(data);
     return data;
   } catch (error) {
     throw new ApiError(401, error?.message || "Error in submitBatch Function");
