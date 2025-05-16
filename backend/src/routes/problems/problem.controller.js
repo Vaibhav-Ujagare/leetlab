@@ -248,5 +248,32 @@ export const deleteProblemById = asyncHandler(async (req, res) => {
 });
 
 export const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => {
-  console.log(req.user.id);
+  try {
+    const problems = await db.problem.findMany({
+      where: {
+        solvedBy: {
+          some: {
+            userId: req.user.id,
+          },
+        },
+      },
+      include: {
+        solvedBy: {
+          where: {
+            userId: req.user.id,
+          },
+        },
+      },
+    });
+
+    if (!problems) {
+      throw new ApiError(401, "Error while fetching problems");
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { problems }, "Problem Fetched Successfully"));
+  } catch (error) {
+    throw new ApiError(401, error?.message || "problem not exist");
+  }
 });
