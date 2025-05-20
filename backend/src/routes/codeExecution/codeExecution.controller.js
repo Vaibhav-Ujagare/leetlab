@@ -80,7 +80,6 @@ export const executeCode = asyncHandler(async (req, res) => {
       },
     });
 
-    console.log("submission", submission);
     if (allPassed) {
       await db.ProblemSolved.upsert({
         where: {
@@ -113,8 +112,6 @@ export const executeCode = asyncHandler(async (req, res) => {
     await db.TestCaseResult.createMany({
       data: testCaseResults,
     });
-
-    console.log("Reached here");
 
     const submissionWithTestCase = await db.submission.findUnique({
       where: {
