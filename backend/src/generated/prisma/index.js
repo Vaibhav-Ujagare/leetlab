@@ -273,7 +273,7 @@ const config = {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://neondb_owner:npg_36janozpstTf@ep-jolly-scene-a493naod-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require\n"
+        "value": "postgresql://postgres:Admin@12345@localhost:5432/leetlab"
       }
     }
   },
