@@ -216,7 +216,7 @@ export const updateProblemById = asyncHandler(async (req, res) => {
           new ApiResponse(
             200,
             { updateProblem },
-            "Problem Created Successfully"
+            "Problem Updated Successfully"
           )
         );
     }
