@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  check,
   forgotPasswordRequest,
   getCurrentUser,
   loginUser,
@@ -18,7 +19,7 @@ authRoutes.post("/register", registerUser);
 
 authRoutes.post("/login", loginUser);
 
-authRoutes.get("/logout", isLoggedIn, logoutUser);
+authRoutes.post("/logout", isLoggedIn, logoutUser);
 
 authRoutes.post("/refresh-token", refreshAccessToken);
 
@@ -31,5 +32,7 @@ authRoutes.post("/forgot-password", forgotPasswordRequest);
 authRoutes.post("/reset-password/:hashedToken", resetPasswordController);
 
 authRoutes.get("/profile", isLoggedIn, getCurrentUser);
+
+authRoutes.get("/check", isLoggedIn, check);
 
 export default authRoutes;

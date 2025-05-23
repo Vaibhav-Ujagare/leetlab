@@ -431,3 +431,18 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
     .setHeader("Authorization", `Bearer ${req.cookies.accessToken}`)
     .json(new ApiResponse(200, req.user, "Current User Fetched Successfully"));
 });
+
+export const check = async (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      message: "User authenticated successfully",
+      user: req.user,
+    });
+  } catch (error) {
+    console.error("Error checking user:", error);
+    res.status(500).json({
+      error: "Error checking user",
+    });
+  }
+};
