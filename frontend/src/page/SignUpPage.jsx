@@ -8,29 +8,31 @@ import { z } from "zod";
 import AuthImagePattern from "../components/AuthImagePattern";
 import { useAuthStore } from "../store/useAuthStore";
 
-const LoginSchema = z.object({
+const SignUpSchema = z.object({
   email: z.string().email("Enter a valid email"),
   password: z.string().min(6, "Password must be atleast of 6 characters"),
+  name: z.string().min(3, "Name must be atleast 3 character"),
 });
 
-const LoginPage = () => {
-  const { isLoggingIn, login } = useAuthStore();
+const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+
+  const { signup, isSigninUp } = useAuthStore();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(LoginSchema),
+    resolver: zodResolver(SignUpSchema),
   });
 
   const onSubmit = async (data) => {
     try {
-      await login(data);
-      console.log(data);
+      await signup(data);
+      console.log("signup data", data);
     } catch (error) {
-      console.error("Signup failed", error);
+      console.error("SignUp failed:", error);
     }
   };
 
@@ -44,13 +46,38 @@ const LoginPage = () => {
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                 <Code className="w-6 h-6 text-primary" />
               </div>
-              <h1 className="text-2xl font-bold mt-2">Welcome Back</h1>
-              <p className="text-base-content/60">Login to your account</p>
+              <h1 className="text-2xl font-bold mt-2">Welcome </h1>
+              <p className="text-base-content/60">Sign Up to your account</p>
             </div>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* name */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Name</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Code className="h-5 w-5 text-base-content/40" />
+                </div>
+                <input
+                  type="text"
+                  {...register("name")}
+                  className={`input input-bordered w-full pl-10 ${
+                    errors.name ? "input-error" : ""
+                  }`}
+                  placeholder="John Doe"
+                />
+              </div>
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+
             {/* Email */}
             <div className="form-control">
               <label className="label">
@@ -116,9 +143,9 @@ const LoginPage = () => {
             <button
               type="submit"
               className="btn btn-primary w-full"
-              disabled={isLoggingIn}
+              disabled={isSigninUp}
             >
-              {isLoggingIn ? (
+              {isSigninUp ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
                   Loading...
@@ -132,9 +159,9 @@ const LoginPage = () => {
           {/* Footer */}
           <div className="text-center">
             <p className="text-base-content/60">
-              Don't have an account?{" "}
-              <Link to="/signup" className="link link-primary">
-                Sign up
+              Already have an account?{" "}
+              <Link to="/login" className="link link-primary">
+                Sign in
               </Link>
             </p>
           </div>
@@ -142,15 +169,14 @@ const LoginPage = () => {
       </div>
 
       {/* Right Side - Image/Pattern */}
-      {/* Right Side - Image/Pattern */}
       <AuthImagePattern
-        title={"Welcome back!"}
+        title={"Welcome to our platform!"}
         subtitle={
-          "Sign in to continue your journey with us. Don't have an account? Create one now."
+          "Sign up to access our platform and start using our services."
         }
       />
     </div>
   );
 };
 
-export default LoginPage;
+export default SignUpPage;

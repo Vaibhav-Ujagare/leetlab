@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Link } from "react-router-dom";
 import { Bookmark, PencilIcon, Trash, TrashIcon, Plus } from "lucide-react";
@@ -20,6 +20,7 @@ const ProblemsTable = ({ problems }) => {
     useState(false);
   const [selectedProblemId, setSelectedProblemId] = useState(null);
 
+  console.log(isAddToPlaylistModalOpen);
   // Extract all unique tags from problems
   const allTags = useMemo(() => {
     if (!Array.isArray(problems)) return [];
@@ -46,7 +47,7 @@ const ProblemsTable = ({ problems }) => {
   }, [problems, search, difficulty, selectedTag]);
 
   // Pagination logic
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredProblems.length / itemsPerPage);
   const paginatedProblems = useMemo(() => {
     return filteredProblems.slice(
@@ -132,9 +133,10 @@ const ProblemsTable = ({ problems }) => {
           <tbody>
             {paginatedProblems.length > 0 ? (
               paginatedProblems.map((problem) => {
-                const isSolved = problem.solvedBy.some(
-                  (user) => user.userId === authUser?.id
-                );
+                const isSolved =
+                  problem.solvedBy?.some(
+                    (user) => user.userId === authUser?.id
+                  ) || false;
                 return (
                   <tr key={problem.id}>
                     <td>

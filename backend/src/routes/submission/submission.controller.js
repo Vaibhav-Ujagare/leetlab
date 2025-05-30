@@ -25,6 +25,7 @@ export const getAllSubmission = asyncHandler(async (req, res) => {
     );
   }
 });
+
 export const getSubmissionForProblem = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const problemId = req.params.problemId;

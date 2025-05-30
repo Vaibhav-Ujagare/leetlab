@@ -1,4 +1,3 @@
-import React from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,7 +25,7 @@ const problemSchema = z.object({
   constraints: z.string().min(1, "Constraints are required"),
   hints: z.string().optional(),
   editorial: z.string().optional(),
-  testcases: z
+  testCases: z
     .array(
       z.object({
         input: z.string().min(1, "Input is required"),
@@ -75,7 +74,7 @@ const sampledpData = {
     "To reach the nth step, you can either come from the (n-1)th step or the (n-2)th step.",
   editorial:
     "This is a classic dynamic programming problem. The number of ways to reach the nth step is the sum of the number of ways to reach the (n-1)th step and the (n-2)th step, forming a Fibonacci-like sequence.",
-  testcases: [
+  testCases: [
     {
       input: "2",
       output: "2",
@@ -322,7 +321,7 @@ const sampleStringProblem = {
     "Consider using two pointers, one from the start and one from the end, moving towards the center.",
   editorial:
     "We can use two pointers approach to check if the string is a palindrome. One pointer starts from the beginning and the other from the end, moving towards each other.",
-  testcases: [
+  testCases: [
     {
       input: "A man, a plan, a canal: Panama",
       output: "true",
@@ -522,7 +521,7 @@ const CreateProblemForm = () => {
   } = useForm({
     resolver: zodResolver(problemSchema),
     defaultValues: {
-      testcases: [{ input: "", output: "" }],
+      testCases: [{ input: "", output: "" }],
       tags: [""],
       examples: {
         JAVASCRIPT: { input: "", output: "", explanation: "" },
@@ -549,7 +548,7 @@ const CreateProblemForm = () => {
     replace: replacetestcases,
   } = useFieldArray({
     control,
-    name: "testcases",
+    name: "testCases",
   });
 
   const {
@@ -583,7 +582,7 @@ const CreateProblemForm = () => {
     const sampleData = sampleType === "DP" ? sampledpData : sampleStringProblem;
 
     replaceTags(sampleData.tags.map((tag) => tag));
-    replacetestcases(sampleData.testcases.map((tc) => tc));
+    replacetestcases(sampleData.testCases.map((tc) => tc));
 
     // Reset the form with sample data
     reset(sampleData);
@@ -784,13 +783,13 @@ const CreateProblemForm = () => {
                           </label>
                           <textarea
                             className="textarea textarea-bordered min-h-24 w-full p-3 resize-y"
-                            {...register(`testcases.${index}.input`)}
+                            {...register(`testCases.${index}.input`)}
                             placeholder="Enter test case input"
                           />
-                          {errors.testcases?.[index]?.input && (
+                          {errors.testCases?.[index]?.input && (
                             <label className="label">
                               <span className="label-text-alt text-error">
-                                {errors.testcases[index].input.message}
+                                {errors.testCases[index].input.message}
                               </span>
                             </label>
                           )}
@@ -803,13 +802,13 @@ const CreateProblemForm = () => {
                           </label>
                           <textarea
                             className="textarea textarea-bordered min-h-24 w-full p-3 resize-y"
-                            {...register(`testcases.${index}.output`)}
+                            {...register(`testCases.${index}.output`)}
                             placeholder="Enter expected output"
                           />
-                          {errors.testcases?.[index]?.output && (
+                          {errors.testCases?.[index]?.output && (
                             <label className="label">
                               <span className="label-text-alt text-error">
-                                {errors.testcases[index].output.message}
+                                {errors.testCases[index].output.message}
                               </span>
                             </label>
                           )}
@@ -819,10 +818,10 @@ const CreateProblemForm = () => {
                   </div>
                 ))}
               </div>
-              {errors.testcases && !Array.isArray(errors.testcases) && (
+              {errors.testCases && !Array.isArray(errors.testCases) && (
                 <div className="mt-2">
                   <span className="text-error text-sm">
-                    {errors.testcases.message}
+                    {errors.testCases.message}
                   </span>
                 </div>
               )}

@@ -31,24 +31,37 @@ export const createProblem = asyncHandler(async (req, res) => {
     for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
       const languageId = getJudge0LanguageId(language);
 
+      console.log(languageId);
+      console.log("languageId----------------------");
       if (!languageId) {
         throw new ApiError(401, `Language ${language} is not supported`);
       }
 
+      console.log("testCases------------\n", testCases);
       const submissions = testCases.map(({ input, output }) => ({
         source_code: solutionCode,
         language_id: languageId,
         stdin: input,
         expected_out: output,
       }));
+
+      console.log("submissions------------------------------------------");
       console.log(submissions);
 
       const submissionResults = await submitBatch(submissions);
-      console.log("----------------------", submissionResults);
+
+      console.log("sumbmissionResults-----------------------------------");
+      console.log(submissionResults);
 
       const tokens = submissionResults.map((res) => res.token);
 
+      console.log("Tokens----------------------------------------------");
+      console.log(tokens);
+
       const results = await pollBatchResults(tokens);
+
+      console.log("Results----------------------------------------");
+      console.log(results);
 
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
@@ -93,7 +106,15 @@ export const createProblem = asyncHandler(async (req, res) => {
 
 export const getAllProblems = asyncHandler(async (req, res) => {
   try {
-    const problems = await db.problem.findMany();
+    const problems = await db.problem.findMany({
+      include: {
+        solvedBy: {
+          where: {
+            userId: req.user.id,
+          },
+        },
+      },
+    });
 
     if (!problems) {
       throw new ApiError(401, "No problem found");

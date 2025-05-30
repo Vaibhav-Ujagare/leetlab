@@ -12,7 +12,7 @@ export const usePlaylistStore = create((set, get) => ({
     try {
       set({ isLoading: true });
       const response = await axiosInstance.post(
-        "/playlist/create-playlist",
+        "/playlists/create-playlist",
         playlistData
       );
 
@@ -34,7 +34,7 @@ export const usePlaylistStore = create((set, get) => ({
   getAllPlaylists: async () => {
     try {
       set({ isLoading: true });
-      const response = await axiosInstance.get("/playlist");
+      const response = await axiosInstance.get("/playlists");
       set({ playlists: response.data.playLists });
     } catch (error) {
       console.error("Error fetching playlists:", error);
@@ -47,7 +47,7 @@ export const usePlaylistStore = create((set, get) => ({
   getPlaylistDetails: async (playlistId) => {
     try {
       set({ isLoading: true });
-      const response = await axiosInstance.get(`/playlist/${playlistId}`);
+      const response = await axiosInstance.get(`/playlists/${playlistId}`);
       set({ currentPlaylist: response.data.playList });
     } catch (error) {
       console.error("Error fetching playlist details:", error);
@@ -60,7 +60,7 @@ export const usePlaylistStore = create((set, get) => ({
   addProblemToPlaylist: async (playlistId, problemIds) => {
     try {
       set({ isLoading: true });
-      await axiosInstance.post(`/playlist/${playlistId}/add-problem`, {
+      await axiosInstance.post(`/playlists/${playlistId}/add-problem`, {
         problemIds,
       });
 
@@ -81,7 +81,7 @@ export const usePlaylistStore = create((set, get) => ({
   removeProblemFromPlaylist: async (playlistId, problemIds) => {
     try {
       set({ isLoading: true });
-      await axiosInstance.post(`/playlist/${playlistId}/remove-problems`, {
+      await axiosInstance.post(`/playlists/${playlistId}/remove-problems`, {
         problemIds,
       });
 

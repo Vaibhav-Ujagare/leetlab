@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 import { useProblemStore } from "../store/useProblemStore";
 import { Loader } from "lucide-react";
