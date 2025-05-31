@@ -54,6 +54,17 @@ export const executeCode = asyncHandler(async (req, res) => {
       };
     });
 
+    console.log("Detailed Result--------------------------------");
+    console.log(detailedResult);
+
+    const allMemories = detailedResult
+      .map((result) => result.memory)
+      .filter(Boolean);
+
+    // memory: allMemories.length ? JSON.stringify(allMemories) : null;
+
+    console.log(allMemories);
+
     const submission = await db.submission.create({
       data: {
         userId,
@@ -72,13 +83,24 @@ export const executeCode = asyncHandler(async (req, res) => {
           : null,
         status: allPassed ? "ACCEPTED" : "WRONG ANSWER",
         memory: detailedResult.some((result) => result.memory)
-          ? JSON.stringify(detailedResult.some((result) => result.memory))
+          ? JSON.stringify(
+              detailedResult
+                .filter((result) => result.memory)
+                .map((result) => result.memory)
+            )
           : null,
         time: detailedResult.some((result) => result.time)
-          ? JSON.stringify(detailedResult.some((result) => result.time))
+          ? JSON.stringify(
+              detailedResult
+                .filter((result) => result.time)
+                .map((result) => result.time)
+            )
           : null,
       },
     });
+
+    console.log("submission-------------------------------");
+    console.log(submission);
 
     if (allPassed) {
       await db.ProblemSolved.upsert({
@@ -108,6 +130,8 @@ export const executeCode = asyncHandler(async (req, res) => {
       memory: result.memory,
       time: result.time,
     }));
+
+    console.log(testCaseResults);
 
     await db.TestCaseResult.createMany({
       data: testCaseResults,

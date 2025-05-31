@@ -30,7 +30,7 @@ const ProblemPage = () => {
   const { getProblemById, problem, isProblemLoading } = useProblemStore();
 
   const {
-    submissions: submissions,
+    submission: submissions,
     isLoading: isSubmissionsLoading,
     getSubmissionForProblem,
     getSubmissionCountForProblem,
@@ -44,7 +44,6 @@ const ProblemPage = () => {
   const [testCases, setTestCases] = useState([]);
 
   const { executeCode, submission, isExecuting } = useExecutionStore();
-
 
   useEffect(() => {
     getProblemById(id);
@@ -72,7 +71,6 @@ const ProblemPage = () => {
       getSubmissionForProblem(id);
     }
   }, [activeTab, id]);
-
 
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
@@ -166,10 +164,12 @@ const ProblemPage = () => {
         );
       case "submissions":
         return (
-          <SubmissionsList
-            submissions={submissions}
-            isLoading={isSubmissionsLoading}
-          />
+          <>
+            <SubmissionsList
+              submissions={submissions}
+              isLoading={isSubmissionsLoading}
+            />
+          </>
         );
       case "discussion":
         return (
