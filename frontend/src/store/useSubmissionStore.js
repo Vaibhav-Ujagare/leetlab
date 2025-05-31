@@ -13,6 +13,7 @@ export const useSubmissionStore = create((set, get) => ({
       set({ isLoading: true });
       const res = await axiosInstance.get("/submission/get-all-submissions");
 
+      console.log(res.data);
       set({ submissions: res.data.submissions });
 
       toast.success(res.data.message);
@@ -27,7 +28,7 @@ export const useSubmissionStore = create((set, get) => ({
   getSubmissionForProblem: async (problemId) => {
     try {
       const res = await axiosInstance.get(
-        `/submission/get-submission/${problemId}`
+        `/submission/get-submissions/${problemId}`
       );
 
       set({ submission: res.data.submissions });

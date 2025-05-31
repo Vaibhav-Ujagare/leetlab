@@ -15,6 +15,7 @@ import {
   Users,
   ThumbsUp,
   Home,
+  CloudSnow,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { useProblemStore } from "../store/useProblemStore";
@@ -29,7 +30,7 @@ const ProblemPage = () => {
   const { getProblemById, problem, isProblemLoading } = useProblemStore();
 
   const {
-    submission: submissions,
+    submissions: submissions,
     isLoading: isSubmissionsLoading,
     getSubmissionForProblem,
     getSubmissionCountForProblem,
@@ -40,9 +41,10 @@ const ProblemPage = () => {
   const [activeTab, setActiveTab] = useState("description");
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [testcases, setTestCases] = useState([]);
+  const [testCases, setTestCases] = useState([]);
 
   const { executeCode, submission, isExecuting } = useExecutionStore();
+
 
   useEffect(() => {
     getProblemById(id);
@@ -52,10 +54,12 @@ const ProblemPage = () => {
   useEffect(() => {
     if (problem) {
       setCode(
-        problem.codeSnippets?.[selectedLanguage] || submission?.sourceCode || ""
+        problem?.codeSnippets[selectedLanguage.toUpperCase()] ||
+          submission?.sourceCode ||
+          ""
       );
       setTestCases(
-        problem.testcases?.map((tc) => ({
+        problem.testCases?.map((tc) => ({
           input: tc.input,
           output: tc.output,
         })) || []
@@ -69,7 +73,6 @@ const ProblemPage = () => {
     }
   }, [activeTab, id]);
 
-  console.log("submission", submissions);
 
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
@@ -81,8 +84,9 @@ const ProblemPage = () => {
     e.preventDefault();
     try {
       const language_id = getLanguageId(selectedLanguage);
-      const stdin = problem.testcases.map((tc) => tc.input);
-      const expected_outputs = problem.testcases.map((tc) => tc.output);
+      const stdin = problem.testCases.map((tc) => tc.input);
+      const expected_outputs = problem.testCases.map((tc) => tc.output);
+
       executeCode(code, language_id, stdin, expected_outputs, id);
     } catch (error) {
       console.log("Error executing code", error);
@@ -237,7 +241,7 @@ const ProblemPage = () => {
           </button>
           <select
             className="select select-bordered select-primary w-40"
-            value={selectedLanguage}
+            value={selectedLanguage.toUpperCase()}
             onChange={handleLanguageChange}
           >
             {Object.keys(problem.codeSnippets || {}).map((lang) => (
@@ -314,7 +318,7 @@ const ProblemPage = () => {
                   onChange={(value) => setCode(value || "")}
                   options={{
                     minimap: { enabled: false },
-                    fontSize: 20,
+                    fontSize: 16,
                     lineNumbers: "on",
                     roundedSelection: false,
                     scrollBeyondLastLine: false,
@@ -363,7 +367,7 @@ const ProblemPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {testcases.map((testCase, index) => (
+                      {testCases.map((testCase, index) => (
                         <tr key={index}>
                           <td className="font-mono">{testCase.input}</td>
                           <td className="font-mono">{testCase.output}</td>

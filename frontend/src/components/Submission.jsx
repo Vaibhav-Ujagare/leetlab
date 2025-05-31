@@ -1,4 +1,3 @@
-import React from "react";
 import {
   CheckCircle2,
   XCircle,
@@ -8,19 +7,17 @@ import {
 
 const SubmissionResults = ({ submission }) => {
   // Parse stringified arrays
-  const memoryArr = JSON.parse(submission.memory || "[]");
-  const timeArr = JSON.parse(submission.time || "[]");
-
-  // Calculate averages
+  const testCasesArr = submission.testCases;
   const avgMemory =
-    memoryArr
-      .map((m) => parseFloat(m)) // remove ' KB' using parseFloat
-      .reduce((a, b) => a + b, 0) / memoryArr.length;
+    testCasesArr
+      .map((memory) => parseFloat(memory.memory))
+      .reduce((a, b) => a + b, 0) / testCasesArr.length;
+ 
 
   const avgTime =
-    timeArr
-      .map((t) => parseFloat(t)) // remove ' s' using parseFloat
-      .reduce((a, b) => a + b, 0) / timeArr.length;
+    testCasesArr
+      .map((time) => parseFloat(time.time)) // remove ' s' using parseFloat
+      .reduce((a, b) => a + b, 0) / testCasesArr.length;
 
   const passedTests = submission.testCases.filter((tc) => tc.passed).length;
   const totalTests = submission.testCases.length;

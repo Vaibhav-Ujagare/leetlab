@@ -20,7 +20,6 @@ const ProblemsTable = ({ problems }) => {
     useState(false);
   const [selectedProblemId, setSelectedProblemId] = useState(null);
 
-  console.log(isAddToPlaylistModalOpen);
   // Extract all unique tags from problems
   const allTags = useMemo(() => {
     if (!Array.isArray(problems)) return [];
