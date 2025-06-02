@@ -64,6 +64,7 @@ const ProblemsTable = ({ problems }) => {
   };
 
   const handleAddToPlaylist = (problemId) => {
+    console.log(problemId);
     setSelectedProblemId(problemId);
     setIsAddToPlaylistModalOpen(true);
   };

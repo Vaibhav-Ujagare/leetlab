@@ -92,10 +92,11 @@ export const addProblemToPlaylist = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Invalid Problem id");
     }
 
-    const problemsInPlaylist = await db.problemsInPlaylist.createMany({
-      data: problemIds.map((probId) => {
-        playlistId, probId;
-      }),
+    const problemsInPlaylist = await db.ProblemInPlaylist.createMany({
+      data: problemIds.map((probId) => ({
+        playListId: playlistId,
+        problemId: probId,
+      })),
     });
 
     return res
